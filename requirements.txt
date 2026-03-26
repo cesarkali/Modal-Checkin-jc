@@ -1,0 +1,28 @@
+# IMPORTANTE:
+# Como este é um projeto Moderno construído em React + Vite (NodeJS),
+# a lista real e completa das dependências é controlada pelo próprio 
+# arquivo base do projeto na raiz: "package.json". 
+# Execute "npm install" no terminal para que o próprio gerenciador as baixe.
+
+# Requisitos do Sistema Operacional:
+Node.js >= 18.0.0
+NPM >= 9.0.0
+
+# Bibliotecas Core (Principais) Utilizadas:
+react==18.3.1
+react-dom==18.3.1
+react-router-dom==6.30.1
+tailwindcss==3.4.17
+vite==5.4.19
+typescript==5.8.3
+lucide-react==0.462.0
+@tanstack/react-query==5.83.0
+react-hook-form==7.61.1
+
+# Ferramentas auxiliares de UI:
+@radix-ui/react-dialog==1.1.14
+@radix-ui/react-tabs==1.1.12
+@radix-ui/react-select==2.2.5
+sonner==1.7.4
+clsx==2.1.1
+tailwind-merge==2.6.0
