@@ -238,7 +238,7 @@ export default function CheckInModal() {
             <div className="grid grid-cols-12 gap-4 mb-4">
               <div className="col-span-3">
                 <label className={labelClass}>CPF</label>
-                <Input placeholder="000.000.000-00" className={inputClass} />
+                <Input placeholder="000.000.000-00" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-5">
                 <label className={labelClass}>Nome do Acompanhante</label>
