@@ -17,12 +17,12 @@ const sections = [
   { id: 'anexos', label: 'Anexos', icon: Paperclip },
 ];
 
-const thClass = "text-left px-3 py-1.5 font-semibold text-xs text-muted-foreground uppercase tracking-wider";
+const thClass = "text-left px-3 py-2 font-semibold text-xs text-foreground uppercase tracking-wider bg-slate-50";
 const tdClass = "px-3 py-1.5 text-sm";
-const labelClass = "block text-xs font-semibold text-muted-foreground mb-1";
-const sectionClass = "bg-card rounded-lg shadow-sm border border-border p-5 scroll-mt-32";
-const inputClass = "h-8 text-sm";
-const selectClass = "h-8 w-full px-2 border border-input rounded-md text-sm focus:border-primary focus:ring-1 focus:ring-primary bg-card";
+const labelClass = "block text-xs font-semibold text-slate-700 mb-1";
+const sectionClass = "bg-white border border-slate-200 shadow-md rounded-lg p-6 scroll-mt-32 mb-12";
+const inputClass = "h-9 text-sm";
+const selectClass = "h-9 w-full px-2 border border-input rounded-md text-sm focus:border-primary focus:ring-1 focus:ring-primary bg-card";
 
 export default function CheckInModal() {
   const [activeSection, setActiveSection] = useState('hospedagem');
@@ -36,7 +36,6 @@ export default function CheckInModal() {
       (entries) => {
         const visible = entries.filter(e => e.isIntersecting);
         if (visible.length > 0) {
-          // Pick the one closest to the top
           const sorted = visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
           setActiveSection(sorted[0].target.id);
         }
@@ -72,13 +71,13 @@ export default function CheckInModal() {
         <div className="h-14 flex items-center justify-between px-5 border-b border-border bg-card rounded-t-lg flex-shrink-0">
           <div className="flex items-center gap-2">
             <Home className="w-5 h-5 text-primary" />
-            <h1 className="text-sm font-bold text-card-foreground">WALK-IN - UH: 108 - Quarto Superior (Duplo)</h1>
+            <h1 className="text-sm font-bold text-foreground">WALK-IN - UH: 108 - Quarto Superior (Duplo)</h1>
           </div>
 
           <div className="flex items-center gap-5">
             <div className="text-center">
               <div className="text-[10px] text-muted-foreground font-medium">Total</div>
-              <div className="text-xs font-bold text-card-foreground">R$ 199,00</div>
+              <div className="text-xs font-bold text-foreground">R$ 199,00</div>
             </div>
             <div className="text-center">
               <div className="text-[10px] text-muted-foreground font-medium">Recebido</div>
@@ -140,26 +139,26 @@ export default function CheckInModal() {
         </div>
 
         {/* Scrollable Content */}
-        <div ref={contentRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <div ref={contentRef} className="flex-1 overflow-y-auto px-5 py-6">
 
           {/* ==================== HOSPEDAGEM ==================== */}
           <section id="hospedagem" ref={setSectionRef('hospedagem')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Hospedagem</h2>
-            <div className="grid grid-cols-4 gap-3">
+            <h2 className="text-sm font-bold mb-4 text-foreground">Hospedagem</h2>
+            <div className="grid grid-cols-12 gap-4">
               {/* Linha 1 */}
-              <div>
+              <div className="col-span-3">
                 <label className={labelClass}>Data Inicial</label>
                 <Input type="date" defaultValue="2026-03-26" className={inputClass} />
               </div>
-              <div>
+              <div className="col-span-3">
                 <label className={labelClass}>Data Final</label>
                 <Input type="date" defaultValue="2026-03-27" className={inputClass} />
               </div>
-              <div>
+              <div className="col-span-2">
                 <label className={labelClass}>Diárias</label>
                 <Input type="number" defaultValue="1" disabled className={`${inputClass} bg-muted`} />
               </div>
-              <div>
+              <div className="col-span-4">
                 <label className={labelClass}>Forma de Pagamento</label>
                 <select className={selectClass}>
                   <option>Aberto</option>
@@ -171,53 +170,53 @@ export default function CheckInModal() {
               </div>
 
               {/* Linha 2 */}
-              <div>
+              <div className="col-span-3">
                 <label className={labelClass}>CPF/CNPJ</label>
                 <div className="relative">
                   <Input placeholder="000.000.000-00" className={`${inputClass} pr-8`} />
-                  <Search className="absolute right-2 top-1.5 w-4 h-4 text-muted-foreground cursor-pointer hover:text-primary" />
+                  <Search className="absolute right-2 top-2 w-4 h-4 text-muted-foreground cursor-pointer hover:text-primary" />
                 </div>
               </div>
-              <div className="col-span-2">
+              <div className="col-span-5">
                 <label className={labelClass}>Titular</label>
-                <div className="flex gap-0">
-                  <Input placeholder="Pesquisar titular..." className={`${inputClass} rounded-r-none`} />
-                  <Button size="sm" className="h-8 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2" title="Novo Cadastro">
+                <div className="flex">
+                  <Input placeholder="Pesquisar titular..." className={`${inputClass} rounded-r-none border-r-0`} />
+                  <Button size="sm" className="h-9 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2.5 border-r border-white/20" title="Novo Cadastro">
                     <Plus className="w-4 h-4" />
                   </Button>
-                  <Button size="sm" className="h-8 rounded-l-none bg-primary hover:bg-primary/90 text-primary-foreground px-2" title="Editar Cadastro">
+                  <Button size="sm" className="h-9 rounded-l-none bg-primary hover:bg-primary/90 text-primary-foreground px-2.5" title="Editar Cadastro">
                     <CreditCard className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
-              <div>
+              <div className="col-span-4">
                 <label className={labelClass}>Empresa de Faturamento</label>
                 <Input placeholder="Empresa" className={inputClass} />
               </div>
 
               {/* Linha 3 */}
-              <div>
+              <div className="col-span-2">
                 <label className={labelClass}>Estrangeiro</label>
-                <div className="flex items-center gap-2 h-8">
+                <div className="flex items-center gap-2 h-9">
                   <Switch checked={isEstrangeiro} onCheckedChange={setIsEstrangeiro} />
                   <span className="text-xs text-muted-foreground">{isEstrangeiro ? 'Sim' : 'Não'}</span>
                 </div>
               </div>
-              <div>
+              <div className="col-span-3">
                 <label className={labelClass}>RG</label>
                 <Input placeholder="RG" className={inputClass} />
               </div>
-              <div>
+              <div className="col-span-2">
                 <label className={labelClass}>Órgão Expedidor</label>
                 <Input placeholder="SSP/SP" className={inputClass} />
               </div>
-              <div>
+              <div className="col-span-5">
                 <label className={labelClass}>Email</label>
                 <Input type="email" placeholder="email@exemplo.com" className={inputClass} />
               </div>
 
               {/* Linha 4 */}
-              <div className="col-span-2">
+              <div className="col-span-6">
                 <label className={labelClass}>Observação</label>
                 <textarea
                   rows={3}
@@ -225,7 +224,7 @@ export default function CheckInModal() {
                   placeholder="Observações gerais..."
                 />
               </div>
-              <div className="col-span-2">
+              <div className="col-span-6">
                 <label className={labelClass}>Observações Internas</label>
                 <textarea
                   rows={3}
@@ -238,20 +237,20 @@ export default function CheckInModal() {
 
           {/* ==================== ACOMPANHANTES ==================== */}
           <section id="acompanhantes" ref={setSectionRef('acompanhantes')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Acompanhantes (1)</h2>
-            <div className="grid grid-cols-12 gap-3 mb-3">
+            <h2 className="text-sm font-bold mb-4 text-foreground">Acompanhantes (1)</h2>
+            <div className="grid grid-cols-12 gap-4 mb-4">
               <div className="col-span-3">
                 <label className={labelClass}>CPF</label>
                 <Input placeholder="000.000.000-00" className={inputClass} />
               </div>
               <div className="col-span-5">
                 <label className={labelClass}>Nome do Acompanhante</label>
-                <div className="flex gap-0">
-                  <Input placeholder="Nome completo" className={`${inputClass} rounded-r-none`} />
-                  <Button size="sm" className="h-8 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2" title="Novo Cadastro">
+                <div className="flex">
+                  <Input placeholder="Nome completo" className={`${inputClass} rounded-r-none border-r-0`} />
+                  <Button size="sm" className="h-9 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2.5 border-r border-white/20" title="Novo Cadastro">
                     <Plus className="w-4 h-4" />
                   </Button>
-                  <Button size="sm" className="h-8 rounded-l-none bg-primary hover:bg-primary/90 text-primary-foreground px-2" title="Editar Cadastro">
+                  <Button size="sm" className="h-9 rounded-l-none bg-primary hover:bg-primary/90 text-primary-foreground px-2.5" title="Editar Cadastro">
                     <Pencil className="w-4 h-4" />
                   </Button>
                 </div>
@@ -264,7 +263,7 @@ export default function CheckInModal() {
                 </select>
               </div>
               <div className="col-span-2 flex items-end">
-                <Button size="sm" className="h-8 w-full bg-success hover:bg-success/90 text-success-foreground">
+                <Button size="sm" className="h-9 w-full bg-success hover:bg-success/90 text-success-foreground">
                   <Plus className="w-4 h-4 mr-1" /> Adicionar
                 </Button>
               </div>
@@ -298,7 +297,7 @@ export default function CheckInModal() {
 
           {/* ==================== TARIFAS ==================== */}
           <section id="tarifas" ref={setSectionRef('tarifas')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Tarifas</h2>
+            <h2 className="text-sm font-bold mb-4 text-foreground">Tarifas</h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -331,9 +330,9 @@ export default function CheckInModal() {
 
           {/* ==================== RECEBIMENTOS ==================== */}
           <section id="recebimentos" ref={setSectionRef('recebimentos')} className={sectionClass}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-card-foreground">Recebimentos</h2>
-              <Button size="sm" className="h-7 text-xs bg-success hover:bg-success/90 text-success-foreground">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold text-foreground">Recebimentos</h2>
+              <Button size="sm" className="h-8 text-xs bg-success hover:bg-success/90 text-success-foreground">
                 <Plus className="w-3.5 h-3.5 mr-1" /> Novo Recebimento
               </Button>
             </div>
@@ -367,7 +366,7 @@ export default function CheckInModal() {
 
           {/* ==================== REFEIÇÕES ==================== */}
           <section id="refeicoes" ref={setSectionRef('refeicoes')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Refeições</h2>
+            <h2 className="text-sm font-bold mb-4 text-foreground">Refeições</h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -398,8 +397,8 @@ export default function CheckInModal() {
 
           {/* ==================== VEÍCULOS ==================== */}
           <section id="veiculos" ref={setSectionRef('veiculos')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Veículos</h2>
-            <div className="grid grid-cols-12 gap-3 mb-3">
+            <h2 className="text-sm font-bold mb-4 text-foreground">Veículos</h2>
+            <div className="grid grid-cols-12 gap-4 mb-4">
               <div className="col-span-3">
                 <label className={labelClass}>Garagem</label>
                 <Input placeholder="Nº Garagem" className={inputClass} />
@@ -417,7 +416,7 @@ export default function CheckInModal() {
                 <Input placeholder="Modelo" className={inputClass} />
               </div>
               <div className="col-span-2 flex items-end">
-                <Button size="sm" className="h-8 w-full bg-success hover:bg-success/90 text-success-foreground">
+                <Button size="sm" className="h-9 w-full bg-success hover:bg-success/90 text-success-foreground">
                   <Plus className="w-4 h-4 mr-1" /> Adicionar
                 </Button>
               </div>
@@ -452,8 +451,8 @@ export default function CheckInModal() {
 
           {/* ==================== EXTRAS ==================== */}
           <section id="extras" ref={setSectionRef('extras')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Extras</h2>
-            <div className="grid grid-cols-12 gap-3 mb-3">
+            <h2 className="text-sm font-bold mb-4 text-foreground">Extras</h2>
+            <div className="grid grid-cols-12 gap-4 mb-4">
               <div className="col-span-4">
                 <label className={labelClass}>Produto/Serviço</label>
                 <Input placeholder="Buscar produto..." className={inputClass} />
@@ -474,7 +473,7 @@ export default function CheckInModal() {
                 <Input placeholder="0,00" type="number" className={inputClass} />
               </div>
               <div className="col-span-2 flex items-end">
-                <Button size="sm" className="h-8 w-full bg-success hover:bg-success/90 text-success-foreground">
+                <Button size="sm" className="h-9 w-full bg-success hover:bg-success/90 text-success-foreground">
                   <Plus className="w-4 h-4 mr-1" /> Adicionar
                 </Button>
               </div>
@@ -513,8 +512,8 @@ export default function CheckInModal() {
 
           {/* ==================== PULSEIRAS ==================== */}
           <section id="pulseiras" ref={setSectionRef('pulseiras')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Pulseiras</h2>
-            <div className="grid grid-cols-12 gap-3 mb-3">
+            <h2 className="text-sm font-bold mb-4 text-foreground">Pulseiras</h2>
+            <div className="grid grid-cols-12 gap-4 mb-4">
               <div className="col-span-4">
                 <label className={labelClass}>Código</label>
                 <Input placeholder="Código da pulseira" className={inputClass} />
@@ -524,7 +523,7 @@ export default function CheckInModal() {
                 <Input placeholder="Nome" className={inputClass} />
               </div>
               <div className="col-span-3 flex items-end">
-                <Button size="sm" className="h-8 w-full bg-success hover:bg-success/90 text-success-foreground">
+                <Button size="sm" className="h-9 w-full bg-success hover:bg-success/90 text-success-foreground">
                   <Plus className="w-4 h-4 mr-1" /> Adicionar
                 </Button>
               </div>
@@ -554,18 +553,21 @@ export default function CheckInModal() {
           </section>
 
           {/* ==================== ANEXOS ==================== */}
-          <section id="anexos" ref={setSectionRef('anexos')} className={`${sectionClass} mb-16`}>
-            <h2 className="text-sm font-bold mb-3 text-card-foreground">Anexos</h2>
+          <section id="anexos" ref={setSectionRef('anexos')} className={`${sectionClass}`}>
+            <h2 className="text-sm font-bold mb-4 text-foreground">Anexos</h2>
             <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
               <Paperclip className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
               <p className="text-xs text-muted-foreground">Arraste arquivos aqui ou clique para selecionar</p>
             </div>
           </section>
+
+          {/* Bottom spacer for last section scroll */}
+          <div className="h-16" />
         </div>
 
         {/* Footer */}
         <div className="h-12 flex items-center justify-end gap-2 px-5 border-t border-border bg-card rounded-b-lg flex-shrink-0">
-          <Button variant="outline" size="sm">Cancelar</Button>
+          <Button variant="outline" size="sm" className="border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</Button>
           <Button size="sm" className="bg-success hover:bg-success/90 text-success-foreground">
             <Check className="w-4 h-4 mr-1" /> Check-in
           </Button>
