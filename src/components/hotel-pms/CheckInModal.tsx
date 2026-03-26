@@ -209,7 +209,7 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-5">
                 <label className={labelClass}>Email</label>
-                <Input type="email" placeholder="email@exemplo.com" className={inputClass} />
+                <Input type="email" placeholder="email@exemplo.com" className={`${inputClass} w-full`} />
               </div>
 
               {/* Linha 4 */}
