@@ -243,7 +243,7 @@ export default function CheckInModal() {
               <div className="col-span-5">
                 <label className={labelClass}>Nome do Acompanhante</label>
                 <div className="flex">
-                  <Input placeholder="Nome completo" className={`${inputClass} rounded-r-none border-r-0`} />
+                  <Input placeholder="Nome completo" className={`${inputClass} w-full rounded-r-none border-r-0`} />
                   <Button size="sm" className="h-9 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2.5 border-r border-white/20" title="Novo Cadastro">
                     <Plus className="w-4 h-4" />
                   </Button>
