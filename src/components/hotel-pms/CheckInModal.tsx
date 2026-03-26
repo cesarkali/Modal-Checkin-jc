@@ -170,7 +170,7 @@ export default function CheckInModal() {
               <div className="col-span-3">
                 <label className={labelClass}>CPF/CNPJ</label>
                 <div className="relative">
-                  <Input placeholder="000.000.000-00" className={`${inputClass} pr-8`} />
+                  <Input placeholder="000.000.000-00" className={`${inputClass} w-full pr-8`} />
                   <Search className="absolute right-2 top-2 w-4 h-4 text-muted-foreground cursor-pointer hover:text-primary" />
                 </div>
               </div>
