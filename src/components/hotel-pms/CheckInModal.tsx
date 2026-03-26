@@ -162,10 +162,7 @@ export default function CheckInModal() {
                 <label className={labelClass}>Forma de Pagamento</label>
                 <select className={selectClass}>
                   <option>Aberto</option>
-                  <option>Cartão de Crédito</option>
-                  <option>Débito</option>
-                  <option>Dinheiro</option>
-                  <option>Pix</option>
+                  <option>Faturado</option>
                 </select>
               </div>
 
