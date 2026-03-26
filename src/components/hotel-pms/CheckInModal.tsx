@@ -148,7 +148,7 @@ export default function CheckInModal() {
               {/* Linha 1 */}
               <div className="col-span-3">
                 <label className={labelClass}>Data Inicial</label>
-                <Input type="date" defaultValue="2026-03-26" className={inputClass} />
+                <Input type="date" defaultValue="2026-03-26" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-3">
                 <label className={labelClass}>Data Final</label>
