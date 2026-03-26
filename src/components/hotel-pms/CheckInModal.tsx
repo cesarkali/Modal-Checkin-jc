@@ -152,7 +152,7 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-3">
                 <label className={labelClass}>Data Final</label>
-                <Input type="date" defaultValue="2026-03-27" className={inputClass} />
+                <Input type="date" defaultValue="2026-03-27" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-2">
                 <label className={labelClass}>Diárias</label>
