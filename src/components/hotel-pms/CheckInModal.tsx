@@ -148,24 +148,21 @@ export default function CheckInModal() {
               {/* Linha 1 */}
               <div className="col-span-3">
                 <label className={labelClass}>Data Inicial</label>
-                <Input type="date" defaultValue="2026-03-26" className={inputClass} />
+                <Input type="date" defaultValue="2026-03-26" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-3">
                 <label className={labelClass}>Data Final</label>
-                <Input type="date" defaultValue="2026-03-27" className={inputClass} />
+                <Input type="date" defaultValue="2026-03-27" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-2">
                 <label className={labelClass}>Diárias</label>
-                <Input type="number" defaultValue="1" disabled className={`${inputClass} bg-muted`} />
+                <Input type="number" defaultValue="1" disabled className={`${inputClass} w-full bg-muted`} />
               </div>
               <div className="col-span-4">
                 <label className={labelClass}>Forma de Pagamento</label>
                 <select className={selectClass}>
                   <option>Aberto</option>
-                  <option>Cartão de Crédito</option>
-                  <option>Débito</option>
-                  <option>Dinheiro</option>
-                  <option>Pix</option>
+                  <option>Faturado</option>
                 </select>
               </div>
 
@@ -173,14 +170,14 @@ export default function CheckInModal() {
               <div className="col-span-3">
                 <label className={labelClass}>CPF/CNPJ</label>
                 <div className="relative">
-                  <Input placeholder="000.000.000-00" className={`${inputClass} pr-8`} />
+                  <Input placeholder="000.000.000-00" className={`${inputClass} w-full pr-8`} />
                   <Search className="absolute right-2 top-2 w-4 h-4 text-muted-foreground cursor-pointer hover:text-primary" />
                 </div>
               </div>
               <div className="col-span-5">
                 <label className={labelClass}>Titular</label>
                 <div className="flex">
-                  <Input placeholder="Pesquisar titular..." className={`${inputClass} rounded-r-none border-r-0`} />
+                  <Input placeholder="Pesquisar titular..." className={`${inputClass} w-full rounded-r-none border-r-0`} />
                   <Button size="sm" className="h-9 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2.5 border-r border-white/20" title="Novo Cadastro">
                     <Plus className="w-4 h-4" />
                   </Button>
@@ -191,28 +188,28 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-4">
                 <label className={labelClass}>Empresa de Faturamento</label>
-                <Input placeholder="Empresa" className={inputClass} />
+                <Input placeholder="Empresa" className={`${inputClass} w-full`} />
               </div>
 
               {/* Linha 3 */}
               <div className="col-span-2">
-                <label className={labelClass}>Estrangeiro</label>
-                <div className="flex items-center gap-2 h-9">
-                  <Switch checked={isEstrangeiro} onCheckedChange={setIsEstrangeiro} />
+                <label className={`${labelClass} opacity-60`}>Estrangeiro</label>
+                <div className="flex items-center gap-2 h-9 opacity-60 cursor-not-allowed">
+                  <Switch checked={isEstrangeiro} disabled />
                   <span className="text-xs text-muted-foreground">{isEstrangeiro ? 'Sim' : 'Não'}</span>
                 </div>
               </div>
               <div className="col-span-3">
                 <label className={labelClass}>RG</label>
-                <Input placeholder="RG" className={inputClass} />
+                <Input placeholder="RG" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-2">
                 <label className={labelClass}>Órgão Expedidor</label>
-                <Input placeholder="SSP/SP" className={inputClass} />
+                <Input placeholder="SSP/SP" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-5">
                 <label className={labelClass}>Email</label>
-                <Input type="email" placeholder="email@exemplo.com" className={inputClass} />
+                <Input type="email" placeholder="email@exemplo.com" className={`${inputClass} w-full`} />
               </div>
 
               {/* Linha 4 */}
@@ -241,12 +238,12 @@ export default function CheckInModal() {
             <div className="grid grid-cols-12 gap-4 mb-4">
               <div className="col-span-3">
                 <label className={labelClass}>CPF</label>
-                <Input placeholder="000.000.000-00" className={inputClass} />
+                <Input placeholder="000.000.000-00" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-5">
                 <label className={labelClass}>Nome do Acompanhante</label>
                 <div className="flex">
-                  <Input placeholder="Nome completo" className={`${inputClass} rounded-r-none border-r-0`} />
+                  <Input placeholder="Nome completo" className={`${inputClass} w-full rounded-r-none border-r-0`} />
                   <Button size="sm" className="h-9 rounded-none bg-success hover:bg-success/90 text-success-foreground px-2.5 border-r border-white/20" title="Novo Cadastro">
                     <Plus className="w-4 h-4" />
                   </Button>
