@@ -30,8 +30,9 @@ All colors MUST be HSL.
     --accent: 187 71% 53%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 100% 45%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 100% 35%;
 
     --success: 149 100% 35%;
     --success-foreground: 0 0% 100%;
