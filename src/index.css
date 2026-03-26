@@ -34,9 +34,9 @@ All colors MUST be HSL.
     --destructive-foreground: 0 0% 100%;
     --destructive-hover: 0 100% 35%;
 
-    --success: 149 100% 35%;
+    --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
-    --success-hover: 149 100% 27%;
+    --success-hover: 160 84% 30%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
