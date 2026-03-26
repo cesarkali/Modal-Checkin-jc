@@ -156,7 +156,7 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-2">
                 <label className={labelClass}>Diárias</label>
-                <Input type="number" defaultValue="1" disabled className={`${inputClass} bg-muted`} />
+                <Input type="number" defaultValue="1" disabled className={`${inputClass} w-full bg-muted`} />
               </div>
               <div className="col-span-4">
                 <label className={labelClass}>Forma de Pagamento</label>
