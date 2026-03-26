@@ -201,7 +201,7 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-3">
                 <label className={labelClass}>RG</label>
-                <Input placeholder="RG" className={inputClass} />
+                <Input placeholder="RG" className={`${inputClass} w-full`} />
               </div>
               <div className="col-span-2">
                 <label className={labelClass}>Órgão Expedidor</label>
