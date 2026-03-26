@@ -188,7 +188,7 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-4">
                 <label className={labelClass}>Empresa de Faturamento</label>
-                <Input placeholder="Empresa" className={inputClass} />
+                <Input placeholder="Empresa" className={`${inputClass} w-full`} />
               </div>
 
               {/* Linha 3 */}
