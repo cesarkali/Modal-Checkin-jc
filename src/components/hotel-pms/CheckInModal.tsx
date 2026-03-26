@@ -193,7 +193,7 @@ export default function CheckInModal() {
 
               {/* Linha 3 */}
               <div className="col-span-2">
-                <label className={labelClass}>Estrangeiro</label>
+                <label className={`${labelClass} opacity-60`}>Estrangeiro</label>
                 <div className="flex items-center gap-2 h-9 opacity-60 cursor-not-allowed">
                   <Switch checked={isEstrangeiro} disabled />
                   <span className="text-xs text-muted-foreground">{isEstrangeiro ? 'Sim' : 'Não'}</span>
