@@ -357,7 +357,7 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-12 md:col-span-3">
                 <label className={labelClass}>Celular</label>
-                <Input type="tel" placeholder="(00) 00000-0000" className={`${inputClass} w-full`} />
+                <Input type="tel" maxLength={20} placeholder="(00) 00000-0000" className={`${inputClass} w-full`} />
               </div>
 
               {/* Linha 4: Observação | Observações Internas */}
@@ -1286,7 +1286,7 @@ export default function CheckInModal() {
                     </div>
                     <div className="col-span-12 sm:col-span-4">
                       <label className={labelClass}>Celular:</label>
-                      <Input type="tel" className={inputClass} placeholder="(00) 00000-0000" />
+                      <Input type="tel" maxLength={20} className={inputClass} placeholder="(00) 00000-0000" />
                     </div>
 
                     {/* Line 6: Estrangeiro */}
