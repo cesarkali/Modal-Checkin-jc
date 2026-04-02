@@ -1,4 +1,4 @@
-# Hotel PMS - Módulo de Check-in (Pixel Perfect) teste
+# Hotel PMS - Módulo de Check-in (Pixel Perfect)
 
 Bem-vindo ao repositório do **Módulo de Check-in do Sistema Hotel PMS**. Este projeto foi desenvolvido com foco em alta performance, UX/UI impecável e 100% de responsividade (desde desktops até dispositivos móveis compactos).
 
