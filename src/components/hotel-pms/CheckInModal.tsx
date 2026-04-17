@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Check, Plus, Trash2, Search, Car, Zap, Tag, Paperclip, Home, Users, DollarSign, Receipt, Utensils, Pencil, CreditCard, Copy, Calendar, Bed, BedSingle, BedDouble, Save, IdCard, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,34 @@ const roomsData: { id: number; number: string; type: RoomType }[] = [
   { id: 20, number: '214', type: 'DBL' },
 ];
 
+type Person = { id: string; name: string; document: string; type: 'PF' | 'PJ' };
+const mockPeople: Person[] = [
+  { id: '1', name: 'João Silva', document: '111.111.111-11', type: 'PF' },
+  { id: '2', name: 'Maria Souza', document: '222.222.222-22', type: 'PF' },
+  { id: '3', name: 'Carlos Santos', document: '333.333.333-33', type: 'PF' },
+  { id: '4', name: 'Ana Oliveira', document: '444.444.444-44', type: 'PF' },
+  { id: '5', name: 'Pedro Costa', document: '555.555.555-55', type: 'PF' },
+  { id: '6', name: 'Tech Solutions LTDA', document: '11.111.111/0001-11', type: 'PJ' },
+  { id: '7', name: 'Global Services SA', document: '22.222.222/0001-22', type: 'PJ' },
+  { id: '8', name: 'Inova Brasil ME', document: '33.333.333/0001-33', type: 'PJ' },
+  { id: '9', name: 'Julio Caliberda', document: '123.456.789-00', type: 'PF' },
+  { id: '10', name: 'Travel Agency Corp', document: '44.444.444/0001-44', type: 'PJ' },
+];
+
+type Product = { id: string; cod: string; desc: string; pdv: string; valor: number };
+const mockProducts: Product[] = [
+  { id: 'p1', cod: '336016', desc: 'Refrigerante 350ml', pdv: 'Bar', valor: 5.00 },
+  { id: 'p2', cod: '336017', desc: 'Água Mineral 500ml', pdv: 'Bar', valor: 4.00 },
+  { id: 'p3', cod: '336018', desc: 'Cerveja Long Neck', pdv: 'Bar', valor: 12.00 },
+  { id: 'p4', cod: '336019', desc: 'Hambúrguer Artesanal', pdv: 'Restaurante', valor: 35.00 },
+  { id: 'p5', cod: '336020', desc: 'Porção de Fritas', pdv: 'Restaurante', valor: 25.00 },
+  { id: 'p6', cod: '336021', desc: 'Suco Natural', pdv: 'Restaurante', valor: 10.00 },
+  { id: 'p7', cod: '336022', desc: 'Café Expresso', pdv: 'Recepção', valor: 6.00 },
+  { id: 'p8', cod: '336023', desc: 'Chocolate em Barra', pdv: 'Frigobar', valor: 8.00 },
+  { id: 'p9', cod: '336024', desc: 'Vinho Tinto Misto', pdv: 'Restaurante', valor: 89.00 },
+  { id: 'p10', cod: '336025', desc: 'Amendoim Japonês', pdv: 'Frigobar', valor: 7.00 },
+];
+
 const thClass = "text-left px-3 py-2 font-semibold text-xs text-foreground uppercase tracking-wider bg-slate-50";
 const tdClass = "px-3 py-1.5 text-sm";
 const labelClass = "block text-xs font-semibold text-slate-700 mb-1";
@@ -61,9 +89,120 @@ const ActionBtn = ({ children, title, rounded, onClick, className }: { children:
       onClick={onClick}
       className={`h-9 bg-primary hover:bg-primary/90 text-primary-foreground px-2.5 border-r border-white/20 ${radiusClass} ${className || ''}`}
     >
-      {children}
+      <span className={className}>{children}</span>
     </Button>
   );
+};
+
+const Autocomplete = ({
+  items,
+  placeholder,
+  value,
+  onChange,
+  renderItem,
+  onSelect,
+}: {
+  items: any[];
+  placeholder: string;
+  value: string;
+  onChange: (val: string) => void;
+  renderItem: (item: any) => React.ReactNode;
+  onSelect: (item: any) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const ref = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => { setHighlightedIndex(-1); }, [items]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative flex-1" ref={ref}>
+      <Input
+        placeholder={placeholder}
+        className="h-9 text-sm w-full rounded-r-none border-r-0"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => {
+            setOpen(true);
+        }}
+        onKeyDown={(e) => {
+          if (!open && e.key === 'ArrowDown') {
+             setOpen(true);
+             return;
+          }
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setHighlightedIndex(prev => (prev < items.length - 1 ? prev + 1 : prev));
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setHighlightedIndex(prev => (prev > 0 ? prev - 1 : prev));
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (open && highlightedIndex >= 0 && highlightedIndex < items.length) {
+              onSelect(items[highlightedIndex]);
+              setOpen(false);
+            }
+          } else if (e.key === 'Escape') {
+            setOpen(false);
+          }
+        }}
+      />
+      {open && items.length > 0 && (
+        <div className="absolute top-full left-0 z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-md max-h-60 overflow-y-auto">
+          {items.map((item, idx) => (
+            <div
+              key={idx}
+              className={`px-3 py-2 text-sm cursor-pointer ${
+                highlightedIndex === idx ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground'
+              }`}
+              onMouseEnter={() => setHighlightedIndex(idx)}
+              onClick={() => {
+                onSelect(item);
+                setOpen(false);
+              }}
+            >
+              {renderItem(item)}
+            </div>
+          ))}
+        </div>
+      )}
+      {open && items.length === 0 && (
+        <div className="absolute top-full left-0 z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-md p-3 text-sm text-muted-foreground text-center">
+          Nenhum resultado encontrado.
+        </div>
+      )}
+    </div>
+  );
+};
+
+const formatCpf = (v: string) => {
+  let val = v.replace(/\D/g, '');
+  if (val.length > 11) val = val.slice(0, 11);
+  return val.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+};
+
+const formatCnpj = (v: string) => {
+  let val = v.replace(/\D/g, '');
+  if (val.length > 14) val = val.slice(0, 14);
+  return val.replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2');
+};
+
+const ErrorMessage = ({ msg, className = '' }: { msg: string, className?: string }) => {
+  if (!msg) return null;
+  return <div className={`text-xs text-destructive font-medium mt-1 ${className}`}>{msg}</div>;
 };
 
 export default function CheckInModal() {
@@ -76,9 +215,90 @@ export default function CheckInModal() {
   const [personEstrangeiro, setPersonEstrangeiro] = useState('NÃO');
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [selectedUh, setSelectedUh] = useState(roomsData[6]); // 108 default
+  // Tariff definitions with pension types
+  const TARIFAS = [
+    { id: '1', name: 'RESORT CLASSIC', pension: 'cafe_manha', pensionLabel: 'Café da Manhã' },
+    { id: '2', name: 'GRAND RELAX', pension: 'meia_almoco', pensionLabel: 'Meia Pensão Almoço' },
+    { id: '3', name: 'SUNSET PREMIUM', pension: 'meia_jantar', pensionLabel: 'Meia Pensão Jantar' },
+    { id: '4', name: 'FULL EXPERIENCE', pension: 'completa', pensionLabel: 'Pensão Completa' },
+    { id: '5', name: 'TOTAL FREEDOM', pension: 'all_inclusive', pensionLabel: 'All Inclusive' },
+  ] as const;
+
+  type TarifaId = typeof TARIFAS[number]['id'];
+  type PensionType = typeof TARIFAS[number]['pension'];
+
   // Per-day tariff values — storing localized string formats
-  const [tarifaValues, setTarifaValues] = useState<string[]>(['199,00', '199,00']);
-  const [tarifaGlobal, setTarifaGlobal] = useState('1 - CAFÉ DA MANHÃ');
+  const [tarifaValues, setTarifaValues] = useState<string[]>(['199,00']);
+  const [tarifaGlobal, setTarifaGlobal] = useState<TarifaId>('1');
+
+  const selectedTarifa = TARIFAS.find(t => t.id === tarifaGlobal) ?? TARIFAS[0];
+
+  const [checkInDate, setCheckInDate] = useState('2026-03-26T14:00');
+  const [checkOutDate, setCheckOutDate] = useState('2026-03-27T11:59');
+
+  const { diarias, nights, calendarDays } = useMemo(() => {
+    const start = new Date(checkInDate);
+    const end = new Date(checkOutDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      const today = new Date().toLocaleDateString('pt-BR');
+      return { diarias: 1, nights: [today], calendarDays: [today, new Date(Date.now() + 86400000).toLocaleDateString('pt-BR')] };
+    }
+
+    const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+    let diffDays = Math.round((endDay.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) diffDays = 0;
+
+    const tariffCount = Math.max(1, diffDays);
+    const nightsArr = [];
+    for (let i = 0; i < tariffCount; i++) {
+      const d = new Date(startDay);
+      d.setDate(d.getDate() + i);
+      nightsArr.push(d.toLocaleDateString('pt-BR'));
+    }
+
+    const calCount = Math.max(1, diffDays + 1);
+    const calDaysArr = [];
+    for (let i = 0; i < calCount; i++) {
+      const d = new Date(startDay);
+      d.setDate(d.getDate() + i);
+      calDaysArr.push(d.toLocaleDateString('pt-BR'));
+    }
+
+    return { diarias: diffDays, nights: nightsArr, calendarDays: calDaysArr };
+  }, [checkInDate, checkOutDate]);
+
+  useEffect(() => {
+    setTarifaValues(prev => {
+      if (prev.length === nights.length) return prev;
+      const newArr = [...prev];
+      while (newArr.length < nights.length) newArr.push(prev[prev.length - 1] || '199,00');
+      return newArr.slice(0, nights.length);
+    });
+  }, [nights.length]);
+
+  // Compute which meals are active per day based on pension + 1-daily rule
+  const getMealState = (dayIdx: number, meal: 'cafe' | 'almoco' | 'jantar'): boolean => {
+    const pension = selectedTarifa.pension;
+    const isCheckInDay = dayIdx === 0;
+
+    const includesCafe = ['cafe_manha', 'meia_almoco', 'meia_jantar', 'completa', 'all_inclusive'].includes(pension);
+    const includesAlmoco = ['meia_almoco', 'completa', 'all_inclusive'].includes(pension);
+    const includesJantar = ['meia_jantar', 'completa', 'all_inclusive'].includes(pension);
+
+    if (isCheckInDay) {
+      if (meal === 'jantar') return includesJantar;
+      return false;
+    }
+
+    // Normal rules for day 1+
+    if (meal === 'cafe') return includesCafe;
+    if (meal === 'almoco') return includesAlmoco;
+    if (meal === 'jantar') return includesJantar;
+    return false;
+  };
 
   const [receiptTab, setReceiptTab] = useState<'dinheiro' | 'deposito' | 'cartao' | 'outros' | 'conta_hospede'>('dinheiro');
   const [receiptValor, setReceiptValor] = useState('');
@@ -112,8 +332,74 @@ export default function CheckInModal() {
 
   const replicateValue = (fromIndex: number) => {
     const value = tarifaValues[fromIndex];
-    setTarifaValues(tarifaValues.map(() => value));
+    setTarifaValues(Array(nights.length).fill(value));
   };
+
+  const totalTarifas = tarifaValues.reduce((acc, val) => {
+    const num = parseFloat(val.replace(/\./g, '').replace(',', '.'));
+    return isNaN(num) ? acc : acc + num;
+  }, 0);
+
+  const totalRecebido = recebimentos.reduce((acc, rec) => {
+    const num = parseFloat(rec.valor.replace(/\./g, '').replace(',', '.'));
+    return isNaN(num) ? acc : acc + num;
+  }, 0);
+
+  const [titularBusca, setTitularBusca] = useState('');
+  const [titularSelected, setTitularSelected] = useState<Person | null>(null);
+  const [titularDoc, setTitularDoc] = useState('');
+
+  const [empresaBusca, setEmpresaBusca] = useState('');
+  const [empresaSelected, setEmpresaSelected] = useState<Person | null>(null);
+  const [empresaDoc, setEmpresaDoc] = useState('');
+
+  const [acompBusca, setAcompBusca] = useState('');
+  const [acompSelected, setAcompSelected] = useState<Person | null>(null);
+  const [acompDoc, setAcompDoc] = useState('');
+  const [acompTipo, setAcompTipo] = useState('Adulto');
+  const [acompIdade, setAcompIdade] = useState('');
+
+  const [acompanhantes, setAcompanhantes] = useState<any[]>([
+    { id: 'mock1', tipo: 'Adulto', nome: 'JULIO CALIBERDA', cpf: '123.456.789-00', idade: '—', personId: '9' }
+  ]);
+
+  const [pulseiraCodigo, setPulseiraCodigo] = useState('');
+  const [pulseiraHospedeBusca, setPulseiraHospedeBusca] = useState('');
+  const [pulseiraHospedeSelected, setPulseiraHospedeSelected] = useState<{id: string, name: string} | null>(null);
+  const [pulseiras, setPulseiras] = useState<any[]>([]);
+
+  const [titularError, setTitularError] = useState('');
+  const [empresaError, setEmpresaError] = useState('');
+  const [acompError, setAcompError] = useState('');
+  const [extraError, setExtraError] = useState('');
+  const [pulseiraError, setPulseiraError] = useState('');
+
+  useEffect(() => { setTitularError(''); }, [titularBusca, titularDoc]);
+  useEffect(() => { setEmpresaError(''); }, [empresaBusca, empresaDoc]);
+  useEffect(() => { setAcompError(''); }, [acompBusca, acompDoc]);
+  useEffect(() => { setPulseiraError(''); }, [pulseiraCodigo, pulseiraHospedeBusca, pulseiraHospedeSelected]);
+
+  const hospedesDisponiveis = [
+    ...(titularSelected ? [{ id: titularSelected.id, name: titularSelected.name, role: 'Titular', faixa: 'Adulto' }] 
+        : titularBusca.trim() ? [{ id: 'titular_manual', name: titularBusca, role: 'Titular', faixa: 'Adulto' }] 
+        : [{ id: 'titular_null', name: 'Titular Não Informado', role: 'Titular', faixa: 'Adulto' }]),
+    ...acompanhantes.map((a, i) => ({ id: a.id || a.personId || `acomp-${i}`, name: a.nome, role: 'Acompanhante', faixa: a.tipo }))
+  ];
+
+  const [extraBusca, setExtraBusca] = useState('');
+  const [extraSelected, setExtraSelected] = useState<Product | null>(null);
+  const [extraFreq, setExtraFreq] = useState('Única');
+  const [extraPdv, setExtraPdv] = useState('Recepção');
+  const [extraQtd, setExtraQtd] = useState(1);
+
+  const [extrasList, setExtrasList] = useState([
+    { id: '1', cod: '336016', desc: 'Refrigerante 350ml', pdv: 'Bar', freq: 'Diariamente', qtd: 1, valor: 5.00, subtotal: 5.00 }
+  ]);
+
+  const totalExtras = extrasList.reduce((acc, curr) => acc + curr.subtotal, 0);
+
+  const totalGeral = totalTarifas + totalExtras;
+  const emAberto = Math.max(0, totalGeral - totalRecebido);
 
   const handleSaveReceipt = () => {
     const rawVal = receiptValor.replace(/\./g, '').replace(',', '.');
@@ -225,7 +511,7 @@ export default function CheckInModal() {
         </div>
 
         {/* Tab Navigation / ScrollSpy */}
-        <div className="h-10 flex items-center overflow-x-auto bg-secondary/50 border-b border-border px-5 gap-0.5 flex-shrink-0">
+        <div className="h-12 flex items-center overflow-x-auto bg-secondary/50 border-b border-border px-5 gap-1 flex-shrink-0">
           {sections.map((section) => {
             const IconComponent = section.icon;
             const isActive = activeSection === section.id;
@@ -233,12 +519,12 @@ export default function CheckInModal() {
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded transition-colors whitespace-nowrap text-xs font-medium ${isActive
+                className={`flex items-center gap-2 px-3 py-2 rounded transition-colors whitespace-nowrap text-sm font-medium ${isActive
                     ? 'bg-card text-primary shadow-sm border-b-2 border-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
                   }`}
               >
-                <IconComponent className="w-3.5 h-3.5" />
+                <IconComponent className="w-4 h-4" />
                 {section.label}
               </button>
             );
@@ -275,7 +561,8 @@ export default function CheckInModal() {
                   <div className="relative flex items-center">
                     <Input 
                       type="datetime-local" 
-                      defaultValue="2026-03-26T14:00" 
+                      value={checkInDate}
+                      onChange={e => setCheckInDate(e.target.value)}
                       className={`${inputClass} w-[150px] rounded-r-none border-r-0 text-xs [&::-webkit-calendar-picker-indicator]:hidden`} 
                     />
                     <ActionBtn 
@@ -293,7 +580,8 @@ export default function CheckInModal() {
                   <div className="relative flex items-center">
                     <Input 
                       type="datetime-local" 
-                      defaultValue="2026-03-27T11:59" 
+                      value={checkOutDate}
+                      onChange={e => setCheckOutDate(e.target.value)}
                       className={`${inputClass} w-[150px] rounded-r-none border-r-0 text-xs [&::-webkit-calendar-picker-indicator]:hidden`} 
                     />
                     <ActionBtn 
@@ -308,7 +596,7 @@ export default function CheckInModal() {
                 </div>
                 <div className="w-20">
                   <label className={labelClass}>Diárias</label>
-                  <Input type="number" defaultValue="1" disabled className={`${inputClass} w-full bg-muted text-center`} />
+                  <Input type="number" value={diarias} readOnly disabled className={`${inputClass} w-full bg-muted text-center font-bold`} />
                 </div>
               </div>
 
@@ -316,16 +604,40 @@ export default function CheckInModal() {
               <div className="col-span-12 md:col-span-3">
                 <label className={labelClass}>CPF / ID</label>
                 <div className="flex">
-                  <Input placeholder="000.000.000-00 / 0000" className={`${inputClass} flex-1 rounded-r-none border-r-0`} />
-                  <ActionBtn rounded="right">
+                  <Input 
+                    placeholder="000.000.000-00 / 0000" 
+                    value={titularDoc}
+                    onChange={(e) => setTitularDoc(formatCpf(e.target.value))}
+                    className={`${inputClass} flex-1 rounded-r-none border-r-0`} 
+                  />
+                  <ActionBtn title="Buscar CPF" rounded="right" onClick={() => {
+                    const found = mockPeople.find(p => p.type === 'PF' && p.document === titularDoc);
+                    if (found) {
+                      setTitularSelected(found);
+                      setTitularBusca(found.name);
+                    } else {
+                      setTitularError('CPF não encontrado.');
+                    }
+                  }}>
                     <Search className="w-3.5 h-3.5" />
                   </ActionBtn>
                 </div>
+                <ErrorMessage msg={titularError} />
               </div>
               <div className="col-span-12 md:col-span-9">
                 <label className={labelClass}>Titular</label>
                 <div className="flex">
-                  <Input placeholder="Pesquisar titular..." className={`${inputClass} flex-1 rounded-r-none border-r-0`} />
+                  <Autocomplete 
+                     placeholder="Pesquisar titular..."
+                     items={mockPeople.filter(p => p.type === 'PF' && p.name.toLowerCase().includes(titularBusca.toLowerCase()))}
+                     value={titularSelected ? titularSelected.name : titularBusca}
+                     onChange={(v) => { setTitularBusca(v); setTitularSelected(null); }}
+                     renderItem={(item) => <div className="font-medium">{item.name} <span className="text-muted-foreground text-xs ml-2">{item.document}</span></div>}
+                     onSelect={(item) => {
+                         setTitularSelected(item);
+                         setTitularDoc(item.document);
+                     }}
+                  />
                   <ActionBtn title="Novo Cadastro" rounded="none" onClick={() => { setPersonType('Física'); setIsPersonModalOpen(true); }}>
                     <Plus className="w-3.5 h-3.5" />
                   </ActionBtn>
@@ -396,16 +708,40 @@ export default function CheckInModal() {
               <div className="col-span-12 md:col-span-3">
                 <label className={labelClass}>CNPJ</label>
                 <div className="flex">
-                  <Input placeholder="00.000.000/0000-00" className={`${inputClass} flex-1 rounded-r-none border-r-0`} />
-                  <ActionBtn rounded="right">
+                  <Input 
+                    placeholder="00.000.000/0000-00" 
+                    value={empresaDoc}
+                    onChange={(e) => setEmpresaDoc(formatCnpj(e.target.value))}
+                    className={`${inputClass} flex-1 rounded-r-none border-r-0`} 
+                  />
+                  <ActionBtn title="Buscar CNPJ" rounded="right" onClick={() => {
+                    const found = mockPeople.find(p => p.type === 'PJ' && p.document === empresaDoc);
+                    if (found) {
+                      setEmpresaSelected(found);
+                      setEmpresaBusca(found.name);
+                    } else {
+                      setEmpresaError('CNPJ não encontrado.');
+                    }
+                  }}>
                     <Search className="w-3.5 h-3.5" />
                   </ActionBtn>
                 </div>
+                <ErrorMessage msg={empresaError} />
               </div>
               <div className="col-span-12 md:col-span-7">
                 <label className={labelClass}>Empresa de Faturamento</label>
                 <div className="flex">
-                  <Input placeholder="Nome da empresa" className={`${inputClass} flex-1 rounded-r-none border-r-0`} />
+                  <Autocomplete 
+                     placeholder="Nome da empresa"
+                     items={mockPeople.filter(p => p.type === 'PJ' && p.name.toLowerCase().includes(empresaBusca.toLowerCase()))}
+                     value={empresaSelected ? empresaSelected.name : empresaBusca}
+                     onChange={(v) => { setEmpresaBusca(v); setEmpresaSelected(null); }}
+                     renderItem={(item) => <div className="font-medium">{item.name} <span className="text-muted-foreground text-xs ml-2">{item.document}</span></div>}
+                     onSelect={(item) => {
+                         setEmpresaSelected(item);
+                         setEmpresaDoc(item.document);
+                     }}
+                  />
                   <ActionBtn title="Nova Empresa" rounded="none" onClick={() => { setPersonType('Jurídica'); setIsPersonModalOpen(true); }}>
                     <Plus className="w-3.5 h-3.5" />
                   </ActionBtn>
@@ -419,14 +755,30 @@ export default function CheckInModal() {
 
           {/* ==================== ACOMPANHANTES ==================== */}
           <section id="acompanhantes" ref={setSectionRef('acompanhantes')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-4 text-foreground">Acompanhantes (1)</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-sm font-bold text-foreground">Acompanhantes ({acompanhantes.length})</h2>
+              <ErrorMessage msg={acompError} className="!mt-0" />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
               {/* CPF(3) | Nome+[+|✏](5) | Tipo(2) | Idade(1) | Adicionar(1) */}
               <div className="col-span-12 md:col-span-3">
                 <label className={labelClass}>CPF / ID</label>
                 <div className="flex">
-                  <Input placeholder="000.000.000-00 / 0000" className={`${inputClass} flex-1 rounded-r-none border-r-0`} />
-                  <ActionBtn rounded="right">
+                  <Input 
+                    placeholder="000.000.000-00 / 0000" 
+                    value={acompDoc}
+                    onChange={(e) => setAcompDoc(formatCpf(e.target.value))}
+                    className={`${inputClass} flex-1 rounded-r-none border-r-0`} 
+                  />
+                  <ActionBtn title="Buscar CPF" rounded="right" onClick={() => {
+                    const found = mockPeople.find(p => p.type === 'PF' && p.document === acompDoc && p.id !== titularSelected?.id);
+                    if (found) {
+                      setAcompSelected(found);
+                      setAcompBusca(found.name);
+                    } else {
+                      setAcompError('CPF não encontrado ou inválido.');
+                    }
+                  }}>
                     <Search className="w-3.5 h-3.5" />
                   </ActionBtn>
                 </div>
@@ -434,7 +786,17 @@ export default function CheckInModal() {
               <div className="col-span-12 md:col-span-5">
                 <label className={labelClass}>Nome do Acompanhante</label>
                 <div className="flex">
-                  <Input placeholder="Pesquisar Acompanhante..." className={`${inputClass} flex-1 rounded-r-none border-r-0`} />
+                  <Autocomplete 
+                     placeholder="Pesquisar Acompanhante..."
+                     items={mockPeople.filter(p => p.type === 'PF' && p.id !== titularSelected?.id && p.name.toLowerCase().includes(acompBusca.toLowerCase()))}
+                     value={acompSelected ? acompSelected.name : acompBusca}
+                     onChange={(v) => { setAcompBusca(v); setAcompSelected(null); }}
+                     renderItem={(item) => <div className="font-medium">{item.name} <span className="text-muted-foreground text-xs ml-2">{item.document}</span></div>}
+                     onSelect={(item) => {
+                         setAcompSelected(item);
+                         setAcompDoc(item.document);
+                     }}
+                  />
                   <ActionBtn title="Novo Cadastro" rounded="none" onClick={() => { setPersonType('Física'); setIsPersonModalOpen(true); }}>
                     <Plus className="w-4 h-4" />
                   </ActionBtn>
@@ -445,9 +807,9 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-12 md:col-span-2">
                 <label className={labelClass}>Tipo</label>
-                <select id="acomp-tipo" className={selectClass} onChange={(e) => {
-                  const idadeField = document.getElementById('acomp-idade') as HTMLSelectElement | null;
-                  if (idadeField) idadeField.disabled = e.target.value !== 'Criança';
+                <select id="acomp-tipo" className={selectClass} value={acompTipo} onChange={(e) => {
+                  setAcompTipo(e.target.value);
+                  if (e.target.value !== 'Criança') setAcompIdade('');
                 }}>
                   <option>Adulto</option>
                   <option>Criança</option>
@@ -455,13 +817,41 @@ export default function CheckInModal() {
               </div>
               <div className="col-span-12 md:col-span-1">
                 <label className={labelClass}>Idade</label>
-                <select id="acomp-idade" disabled defaultValue="" className={`${selectClass} opacity-50 cursor-not-allowed`}>
-                  <option value="">Selecione</option>
+                <select 
+                  id="acomp-idade" 
+                  disabled={acompTipo !== 'Criança'} 
+                  value={acompIdade}
+                  onChange={(e) => setAcompIdade(e.target.value)}
+                  className={`${selectClass} ${acompTipo !== 'Criança' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <option value="">N/I</option>
                   {Array.from({ length: 18 }, (_, i) => <option key={i} value={i}>{i}</option>)}
                 </select>
               </div>
               <div className="col-span-12 md:col-span-1 flex items-end">
-                <Button size="sm" className="h-9 w-full bg-primary hover:bg-primary/90 text-primary-foreground px-1.5">
+                <Button 
+                   size="sm" 
+                   className="h-9 w-full bg-primary hover:bg-primary/90 text-primary-foreground px-1.5"
+                   onClick={() => {
+                     if (!acompSelected && !acompBusca.trim()) {
+                       setAcompError('Informe um acompanhante.');
+                       return;
+                     }
+                     setAcompanhantes([...acompanhantes, {
+                       id: Date.now().toString(),
+                       tipo: acompTipo,
+                       nome: acompSelected ? acompSelected.name : acompBusca,
+                       cpf: acompDoc || '—',
+                       idade: acompIdade || '—',
+                       personId: acompSelected?.id || 'manual'
+                     }]);
+                     setAcompSelected(null);
+                     setAcompBusca('');
+                     setAcompDoc('');
+                     setAcompTipo('Adulto');
+                     setAcompIdade('');
+                   }}
+                >
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -478,18 +868,31 @@ export default function CheckInModal() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-border/50 hover:bg-secondary/30">
-                    <td className={tdClass}>ADULTO</td>
-                    <td className={`${tdClass} font-medium`}>JULIO CALIBERDA</td>
-                    <td className={tdClass}>123.456.789-00</td>
-                    <td className={tdClass}>—</td>
-                    <td className={tdClass}>
-                      <div className="flex items-center gap-1">
-                        <button className="text-primary hover:text-primary/80 p-0.5"><Pencil className="w-3.5 h-3.5" /></button>
-                        <button className="text-destructive hover:text-destructive/80 p-0.5"><Trash2 className="w-3.5 h-3.5" /></button>
-                      </div>
-                    </td>
-                  </tr>
+                  {acompanhantes.map((acomp) => (
+                    <tr key={acomp.id} className="border-b border-border/50 hover:bg-secondary/30">
+                      <td className={tdClass}>{acomp.tipo.toUpperCase()}</td>
+                      <td className={`${tdClass} font-medium`}>{acomp.nome}</td>
+                      <td className={tdClass}>{acomp.cpf}</td>
+                      <td className={tdClass}>{acomp.idade}</td>
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-1">
+                          <button 
+                             onClick={() => {
+                               setPersonType('Física');
+                               setIsPersonModalOpen(true);
+                             }}
+                             className="text-primary hover:text-primary/80 p-0.5"
+                          ><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => setAcompanhantes((prev: any[]) => prev.filter(p => p.id !== acomp.id))} className="text-destructive hover:text-destructive/80 p-0.5"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {acompanhantes.length === 0 && (
+                    <tr className="border-b border-border/50">
+                       <td colSpan={5} className="text-center py-4 text-sm text-muted-foreground border-border/50">Nenhum acompanhante adicionado.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -497,20 +900,24 @@ export default function CheckInModal() {
 
           {/* ==================== TARIFAS ==================== */}
           <section id="tarifas" ref={setSectionRef('tarifas')} className={sectionClass}>
-            {/* Header: title + single tarifa selector for all days */}
-            <div className="flex items-center gap-4 mb-4">
+            {/* Header: title + full-row tarifa selector + pension info badge */}
+            <div className="flex items-center gap-3 mb-4">
               <h2 className="text-sm font-bold text-foreground whitespace-nowrap">Tarifas</h2>
-              <div className="flex items-center gap-2">
-                <label className={`${labelClass} mb-0 whitespace-nowrap`}>Tarifa:</label>
-                <select
-                  className="h-8 px-2 border border-input rounded text-sm bg-card min-w-[260px]"
-                  value={tarifaGlobal}
-                  onChange={(e) => setTarifaGlobal(e.target.value)}
-                >
-                  <option>1 - CAFÉ DA MANHÃ</option>
-                  <option>2 - MEIA PENSÃO</option>
-                  <option>3 - PENSÃO COMPLETA</option>
-                </select>
+              <label className={`${labelClass} mb-0 whitespace-nowrap`}>Tarifa:</label>
+              {/* Selector fills available horizontal space */}
+              <select
+                className="h-8 px-2 border border-input rounded text-sm bg-card flex-1"
+                value={tarifaGlobal}
+                onChange={(e) => setTarifaGlobal(e.target.value as TarifaId)}
+              >
+                {TARIFAS.map(t => (
+                  <option key={t.id} value={t.id}>{t.id} - {t.name}</option>
+                ))}
+              </select>
+              {/* Pension info badge — right side */}
+              <div className="flex items-center gap-1.5 h-8 px-3 border border-primary/30 rounded bg-primary/5 whitespace-nowrap flex-shrink-0">
+                <Utensils className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-semibold text-primary">Pensão: {selectedTarifa.pensionLabel}</span>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -524,10 +931,10 @@ export default function CheckInModal() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(['26/03/2026', '27/03/2026'] as const).map((dia, i) => (
-                    <tr key={dia} className="border-b border-border/50 hover:bg-secondary/30">
+                  {nights.map((dia, i) => (
+                    <tr key={i} className="border-b border-border/50 hover:bg-secondary/30">
                       <td className={tdClass}>{dia}</td>
-                      <td className={`${tdClass} text-muted-foreground font-medium`}>{tarifaGlobal}</td>
+                      <td className={`${tdClass} text-muted-foreground font-medium`}>{selectedTarifa.id} - {selectedTarifa.name}</td>
                       <td className={tdClass}>
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs text-muted-foreground">R$</span>
@@ -556,6 +963,13 @@ export default function CheckInModal() {
                     </tr>
                   ))}
                 </tbody>
+                <tfoot>
+                  <tr className="bg-primary/5 font-bold border-t-2 border-border">
+                    <td colSpan={2} className={`${tdClass} text-right text-primary uppercase text-xs tracking-wider`}>Total de Tarifas</td>
+                    <td className={`${tdClass} text-primary`}>R$ {formatCurrency(Math.round(totalTarifas * 100).toString())}</td>
+                    <td className={tdClass}></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </section>
@@ -851,7 +1265,10 @@ export default function CheckInModal() {
           <section id="refeicoes" ref={setSectionRef('refeicoes')} className={sectionClass}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-bold text-foreground">Refeições</h2>
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded">Pensão: 1 - CAFÉ DA MANHÃ</span>
+              <div className="flex items-center gap-1.5 h-7 px-2.5 border border-primary/30 rounded bg-primary/5">
+                <Utensils className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-semibold text-primary">Pensão: {selectedTarifa.pensionLabel}</span>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -867,18 +1284,49 @@ export default function CheckInModal() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-border/50 hover:bg-secondary/30">
-                    <td className={tdClass}>26/03</td>
-                    <td className={`${tdClass} font-medium`}>JULIO CALIBERDA</td>
-                    <td className={tdClass}>Adulto</td>
-                    <td className={tdClass}>Titular</td>
-                    <td className={`${tdClass} text-center`}><Checkbox defaultChecked /></td>
-                    <td className={`${tdClass} text-center`}><Checkbox /></td>
-                    <td className={`${tdClass} text-center`}><Checkbox /></td>
-                  </tr>
+                  {calendarDays.flatMap((dia, dayIdx) => 
+                    hospedesDisponiveis.map((hospede, hIdx) => (
+                      <tr key={`${dayIdx}-${hIdx}`} className="border-b border-border/50 hover:bg-secondary/30">
+                        <td className={tdClass}>{hIdx === 0 ? dia.slice(0, 5) : ''}</td>
+                        <td className={`${tdClass} font-medium`}>{hospede.name}</td>
+                        <td className={tdClass}>{hospede.faixa}</td>
+                        <td className={tdClass}>{hospede.role}</td>
+                        <td className={`${tdClass} text-center`}>
+                          <Checkbox
+                            checked={getMealState(dayIdx, 'cafe')}
+                            disabled
+                            className={getMealState(dayIdx, 'cafe') ? 'opacity-100' : 'opacity-40'}
+                          />
+                        </td>
+                        <td className={`${tdClass} text-center`}>
+                          <Checkbox
+                            checked={getMealState(dayIdx, 'almoco')}
+                            disabled
+                            className={getMealState(dayIdx, 'almoco') ? 'opacity-100' : 'opacity-40'}
+                          />
+                        </td>
+                        <td className={`${tdClass} text-center`}>
+                          <Checkbox
+                            checked={getMealState(dayIdx, 'jantar')}
+                            disabled
+                            className={getMealState(dayIdx, 'jantar') ? 'opacity-100' : 'opacity-40'}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                  {calendarDays.length === 0 && (
+                    <tr className="border-b border-border/50">
+                      <td colSpan={7} className="text-center py-4 text-sm text-muted-foreground border-border/50">Nenhuma refeição disponível para este período.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
+            {/* Pension rule note */}
+            <p className="text-xs text-muted-foreground mt-2">
+              <span className="font-semibold">Regra de pensão:</span> No dia do check-in, somente o <span className="font-semibold">jantar</span> é marcado (quando incluso). Café da manhã e almoço iniciam no dia seguinte.
+            </p>
           </section>
 
           {/* ==================== VEÍCULOS ==================== */}
@@ -937,42 +1385,90 @@ export default function CheckInModal() {
 
           {/* ==================== EXTRAS ==================== */}
           <section id="extras" ref={setSectionRef('extras')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-4 text-foreground">Extras</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-sm font-bold text-foreground">Lançamentos Extras</h2>
+              <ErrorMessage msg={extraError} className="!mt-0" />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
-              <div className="col-span-12 md:col-span-3">
+              <div className="col-span-12 md:col-span-4">
                 <label className={labelClass}>Produto/Serviço</label>
-                <Input placeholder="Buscar produto..." className={`${inputClass} w-full`} />
+                <Autocomplete 
+                   placeholder="Pesquisar extra..."
+                   items={mockProducts.filter(p => p.desc.toLowerCase().includes(extraBusca.toLowerCase()))}
+                   value={extraSelected ? extraSelected.desc : extraBusca}
+                   onChange={v => {
+                      setExtraBusca(v);
+                      setExtraSelected(null);
+                      setExtraValor('');
+                   }}
+                   renderItem={item => <div className="font-medium">{item.desc} <span className="text-muted-foreground text-xs ml-2">R$ {formatCurrency(Math.round(item.valor * 100).toString())}</span></div>}
+                   onSelect={item => {
+                       setExtraSelected(item);
+                       setExtraValor(formatCurrency(Math.round(item.valor * 100).toString()));
+                   }}
+                />
               </div>
               <div className="col-span-12 md:col-span-2">
                 <label className={labelClass}>Frequência</label>
-                <select className={selectClass}>
+                <select className={selectClass} value={extraFreq} onChange={e => setExtraFreq(e.target.value)}>
                   <option>Única</option>
                   <option>Diariamente</option>
                 </select>
               </div>
               <div className="col-span-12 md:col-span-2">
                 <label className={labelClass}>PDV</label>
-                <select className={selectClass}>
+                <select className={selectClass} value={extraPdv} onChange={e => setExtraPdv(e.target.value)}>
                   <option>Recepção</option>
+                  <option>Bar</option>
                   <option>Restaurante</option>
-                  <option>Frigobar</option>
                 </select>
               </div>
               <div className="col-span-12 md:col-span-1">
                 <label className={labelClass}>Qtd.</label>
-                <Input placeholder="1" type="number" min="1" defaultValue="1" className={`${inputClass} w-full`} />
+                <Input type="number" min="1" className={`${inputClass} w-full`} value={extraQtd} onChange={e => setExtraQtd(Number(e.target.value))} />
               </div>
-              <div className="col-span-12 md:col-span-2">
-                <label className={labelClass}>Valor</label>
+              <div className="col-span-12 md:col-span-1">
+                <label className={labelClass}>Valor Unitário</label>
                 <Input 
                   placeholder="0,00" 
                   className={`${inputClass} w-full`}
                   value={extraValor}
-                  onChange={(e) => setExtraValor(formatCurrency(e.target.value))}
+                  onChange={(e) => {
+                      setExtraValor(formatCurrency(e.target.value));
+                      setExtraError('');
+                  }}
                 />
               </div>
               <div className="col-span-12 md:col-span-2 flex items-end">
-                <Button size="sm" className="h-9 w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button 
+                   size="sm" 
+                   className="h-9 w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                   onClick={() => {
+                     if (!extraSelected) {
+                       setExtraError('Selecione um produto.');
+                       return;
+                     }
+                     const val = parseFloat(extraValor.replace(/\./g, '').replace(',', '.')) || 0;
+                     if (val <= 0) {
+                       setExtraError('Valor inválido.');
+                       return;
+                     }
+                     setExtrasList([...extrasList, {
+                       id: Date.now().toString(),
+                       cod: extraSelected.cod,
+                       desc: extraSelected.desc,
+                       pdv: extraPdv,
+                       freq: extraFreq,
+                       qtd: extraQtd,
+                       valor: val,
+                       subtotal: val * extraQtd
+                     }]);
+                     setExtraSelected(null);
+                     setExtraBusca('');
+                     setExtraQtd(1);
+                     setExtraValor('');
+                   }}
+                >
                   <Plus className="w-4 h-4 mr-1" /> Adicionar
                 </Button>
               </div>
@@ -992,37 +1488,90 @@ export default function CheckInModal() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-border/50 hover:bg-secondary/30">
-                    <td className={tdClass}>336016</td>
-                    <td className={tdClass}>Refrigerante 350ml</td>
-                    <td className={tdClass}>Bar</td>
-                    <td className={tdClass}>Diariamente</td>
-                    <td className={tdClass}>1</td>
-                    <td className={tdClass}>R$ 5,00</td>
-                    <td className={`${tdClass} font-bold`}>R$ 5,00</td>
-                    <td className={tdClass}>
-                      <button className="text-destructive hover:text-destructive/80 p-0.5"><Trash2 className="w-3.5 h-3.5" /></button>
-                    </td>
-                  </tr>
+                  {extrasList.map(extra => (
+                    <tr key={extra.id} className="border-b border-border/50 hover:bg-secondary/30">
+                      <td className={tdClass}>{extra.cod}</td>
+                      <td className={tdClass}>{extra.desc}</td>
+                      <td className={tdClass}>{extra.pdv}</td>
+                      <td className={tdClass}>{extra.freq}</td>
+                      <td className={tdClass}>{extra.qtd}</td>
+                      <td className={tdClass}>R$ {formatCurrency(Math.round(extra.valor * 100).toString())}</td>
+                      <td className={`${tdClass} font-bold`}>R$ {formatCurrency(Math.round(extra.subtotal * 100).toString())}</td>
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              setExtraSelected({ id: extra.id, cod: extra.cod, desc: extra.desc, pdv: extra.pdv, valor: extra.valor });
+                              setExtraFreq(extra.freq);
+                              setExtraQtd(extra.qtd);
+                              setExtraPdv(extra.pdv);
+                              setExtrasList((prev: any[]) => prev.filter(p => p.id !== extra.id));
+                            }}
+                            className="text-primary hover:text-primary/80 p-0.5"
+                          ><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => setExtrasList((prev: any[]) => prev.filter(p => p.id !== extra.id))} className="text-destructive hover:text-destructive/80 p-0.5"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
+                <tfoot>
+                  <tr className="bg-primary/5 font-bold border-t-2 border-border">
+                    <td colSpan={6} className={`${tdClass} text-right text-primary uppercase text-xs tracking-wider`}>Total de Extras</td>
+                    <td className={`${tdClass} text-primary`}>R$ {formatCurrency(Math.round(totalExtras * 100).toString())}</td>
+                    <td className={tdClass}></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </section>
 
           {/* ==================== PULSEIRAS ==================== */}
           <section id="pulseiras" ref={setSectionRef('pulseiras')} className={sectionClass}>
-            <h2 className="text-sm font-bold mb-4 text-foreground">Pulseiras</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-sm font-bold text-foreground">Pulseiras</h2>
+              <ErrorMessage msg={pulseiraError} className="!mt-0" />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
               <div className="col-span-12 md:col-span-4">
                 <label className={labelClass}>Código</label>
-                <Input placeholder="Código da pulseira" className={`${inputClass} w-full`} />
+                <Input 
+                   placeholder="Código da pulseira" 
+                   value={pulseiraCodigo} 
+                   onChange={e => setPulseiraCodigo(e.target.value)} 
+                   className={`${inputClass} w-full`} 
+                />
               </div>
               <div className="col-span-12 md:col-span-5">
                 <label className={labelClass}>Nome do Hóspede</label>
-                <Input placeholder="Nome" className={`${inputClass} w-full`} />
+                <Autocomplete 
+                   placeholder="Nome do hóspede..."
+                   items={hospedesDisponiveis.filter(h => h.name.toLowerCase().includes(pulseiraHospedeBusca.toLowerCase()))}
+                   value={pulseiraHospedeSelected ? pulseiraHospedeSelected.name : pulseiraHospedeBusca}
+                   onChange={v => { setPulseiraHospedeBusca(v); setPulseiraHospedeSelected(null); }}
+                   renderItem={item => <div className="font-medium">{item.name}</div>}
+                   onSelect={item => setPulseiraHospedeSelected(item)}
+                />
               </div>
               <div className="col-span-12 md:col-span-3 flex items-end">
-                <Button size="sm" className="h-9 w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button 
+                   size="sm" 
+                   className="h-9 w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                   onClick={() => {
+                     if (!pulseiraCodigo || (!pulseiraHospedeSelected && !pulseiraHospedeBusca.trim())) {
+                       setPulseiraError('Selecione um hóspede e insira um código.');
+                       return;
+                     }
+                     if (pulseiras.find(p => p.codigo === pulseiraCodigo)) {
+                       setPulseiraError('Pulseira já cadastrada.');
+                       return;
+                     }
+                     setPulseiras([...pulseiras, { id: Date.now().toString(), codigo: pulseiraCodigo, hospede: pulseiraHospedeSelected ? pulseiraHospedeSelected.name : pulseiraHospedeBusca }]);
+                     setPulseiraCodigo('');
+                     setPulseiraHospedeSelected(null);
+                     setPulseiraHospedeBusca('');
+                   }}
+                >
                   <Plus className="w-4 h-4 mr-1" /> Adicionar
                 </Button>
               </div>
@@ -1038,14 +1587,31 @@ export default function CheckInModal() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-border/50 hover:bg-secondary/30">
-                    <td className={tdClass}>1</td>
-                    <td className={tdClass}>123132</td>
-                    <td className={tdClass}>JULIO CALIBERDA</td>
-                    <td className={tdClass}>
-                      <button className="text-destructive hover:text-destructive/80 p-0.5"><Trash2 className="w-3.5 h-3.5" /></button>
-                    </td>
-                  </tr>
+                  {pulseiras.map((p, i) => (
+                    <tr key={p.id} className="border-b border-border/50 hover:bg-secondary/30">
+                      <td className={tdClass}>{i + 1}</td>
+                      <td className={tdClass}>{p.codigo}</td>
+                      <td className={tdClass}>{p.hospede}</td>
+                      <td className={tdClass}>
+                        <div className="flex gap-1">
+                          <button 
+                             onClick={() => {
+                               setPulseiraCodigo(p.codigo);
+                               setPulseiraHospedeSelected({ id: 'any', name: p.hospede });
+                               setPulseiras(prev => prev.filter(x => x.id !== p.id));
+                             }}
+                             className="text-primary hover:text-primary/80 p-0.5"
+                          ><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => setPulseiras(prev => prev.filter(x => x.id !== p.id))} className="text-destructive hover:text-destructive/80 p-0.5"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {pulseiras.length === 0 && (
+                    <tr className="border-b border-border/50">
+                       <td colSpan={4} className="text-center py-4 text-sm text-muted-foreground border-border/50">Nenhuma pulseira adicionada.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1070,15 +1636,15 @@ export default function CheckInModal() {
           <div className="flex items-center gap-5">
             <div className="text-center">
               <div className="text-xs text-muted-foreground font-medium">Total</div>
-              <div className="text-base font-bold text-foreground">R$ 199,00</div>
+              <div className="text-base font-bold text-foreground">R$ {formatCurrency(Math.round(totalGeral * 100).toString())}</div>
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground font-medium">Recebido</div>
-              <div className="text-base font-bold text-success">R$ 0,20</div>
+              <div className="text-base font-bold text-success">R$ {formatCurrency(Math.round(totalRecebido * 100).toString())}</div>
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground font-medium">Em Aberto</div>
-              <div className="text-base font-bold text-destructive">R$ 198,80</div>
+              <div className="text-base font-bold text-destructive">R$ {formatCurrency(Math.round(emAberto * 100).toString())}</div>
             </div>
           </div>
           <div className="w-px h-6 bg-border" />{/* divider */}
